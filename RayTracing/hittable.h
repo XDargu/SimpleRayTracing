@@ -1,9 +1,12 @@
 #pragma once
 
+class Material;
+
 struct HitRecord
 {
     Point3 p;
     Vec3 normal;
+    shared_ptr<Material> mat;
     double t;
     bool frontFace;
 
