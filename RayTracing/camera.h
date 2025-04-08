@@ -103,7 +103,7 @@ private:
         HitRecord rec;
         if (world.Hit(r, Interval(0.001, infinity), rec))
         {
-            const Vec3 direction = Random::OnHemisphere(rec.normal);
+            const Vec3 direction = rec.normal + Random::UnitVector();
             return 0.5 * RayColor(Ray(rec.p, direction), depth - 1, world);
         }
 
