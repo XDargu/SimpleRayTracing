@@ -145,6 +145,16 @@ namespace Random
         else
             return -on_unit_sphere;
     }
+
+    inline Vec3 InUnitDisk()
+    {
+        while (true)
+        {
+            const Vec3 p = Vec3(Random::Double(-1, 1), Random::Double(-1, 1), 0);
+            if (p.LengthSquared() < 1)
+                return p;
+        }
+    }
 }
 
 inline Vec3 Reflect(const Vec3& v, const Vec3& n)
