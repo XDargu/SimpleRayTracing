@@ -151,3 +151,11 @@ inline Vec3 Reflect(const Vec3& v, const Vec3& n)
 {
     return v - 2 * Dot(v, n) * n;
 }
+
+inline Vec3 Refract(const Vec3& uv, const Vec3& n, double etaiOver_Etat)
+{
+    const double cosTheta = std::fmin(Dot(-uv, n), 1.0);
+    const Vec3 r_outPerp = etaiOver_Etat * (uv + cosTheta * n);
+    const Vec3 r_outParallel = -std::sqrt(std::fabs(1.0 - r_outPerp.LengthSquared())) * n;
+    return r_outPerp + r_outParallel;
+}
