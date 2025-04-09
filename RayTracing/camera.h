@@ -2,6 +2,7 @@
 
 #include "hittable.h"
 #include "material.h"
+#include <thread>
 
 class Camera
 {
@@ -26,17 +27,47 @@ public:
 
         std::cout << "P3\n" << imageWidth << ' ' << imageHeight << "\n255\n";
 
+        std::vector<Color> resultsPerSample(samplesPerPixel);
+        std::vector<std::thread> threads(samplesPerPixel);
+
+        constexpr bool useAsync = true;
+
         for (int j = 0; j < imageHeight; j++)
         {
             std::clog << "\rScanlines remaining: " << (imageHeight - j) << ' ' << std::flush;
             for (int i = 0; i < imageWidth; i++)
             {
                 Color pixelColor(0, 0, 0);
-                for (int sample = 0; sample < samplesPerPixel; sample++)
+                
+                if (useAsync)
                 {
-                    const Ray r = GetRay(i, j);
-                    pixelColor += RayColor(r, maxDepth, world);
+                    for (int sample = 0; sample < samplesPerPixel; sample++)
+                    {
+                        threads[sample] = std::thread([this, &resultsPerSample, &world, i, j, sample] {
+                            const Ray r = GetRay(i, j);
+                            resultsPerSample[sample] = RayColor(r, maxDepth, world);
+                        });
+                    }
+
+                    for (unsigned int i = 0; i < threads.size(); ++i)
+                    {
+                        threads.at(i).join();
+                    }
+
+                    for (unsigned int i = 0; i < threads.size(); ++i)
+                    {
+                        pixelColor += resultsPerSample.at(i);
+                    }
                 }
+                else
+                {
+                    for (int sample = 0; sample < samplesPerPixel; sample++)
+                    {
+                        const Ray r = GetRay(i, j);
+                        pixelColor += RayColor(r, maxDepth, world);
+                    }
+                }
+
                 WriteColor(std::cout, pixelColor * pixelSamplesScale);
             }
         }
