@@ -134,12 +134,15 @@
     <ClInclude Include="bvh.h" />
     <ClInclude Include="camera.h" />
     <ClInclude Include="color.h" />
+    <ClInclude Include="external\stb_image.h" />
+    <ClInclude Include="external\stb_image_write.h" />
     <ClInclude Include="hittable.h" />
     <ClInclude Include="hittableList.h" />
     <ClInclude Include="interval.h" />
     <ClInclude Include="material.h" />
     <ClInclude Include="ray.h" />
     <ClInclude Include="raytracing.h" />
+    <ClInclude Include="rt_stb_image.h" />
     <ClInclude Include="sphere.h" />
     <ClInclude Include="texture.h" />
     <ClInclude Include="vec3.h" />

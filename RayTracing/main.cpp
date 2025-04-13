@@ -8,6 +8,29 @@
 #include "sphere.h"
 #include "texture.h"
 
+void Earth()
+{
+    auto earthTexture = make_shared<ImageTexture>("earthmap.jpg");
+    auto earthSurface = make_shared<Lambertian>(earthTexture);
+    auto globe = make_shared<Sphere>(Point3(0, 0, 0), 2, earthSurface);
+
+    Camera cam;
+
+    cam.aspectRatio = 16.0 / 9.0;
+    cam.imageWidth = 400;
+    cam.samplesPerPixel = 10;
+    cam.maxDepth = 50;
+
+    cam.vfov = 20;
+    cam.lookFrom = Point3(0, 0, 12);
+    cam.lookAt = Point3(0, 0, 0);
+    cam.up = Vec3(0, 1, 0);
+
+    cam.defocusAngle = 0;
+
+    cam.Render(HittableList(globe));
+}
+
 void BouncingSpheres()
 {
     HittableList world;
@@ -105,9 +128,10 @@ void CheckeredSpheres()
 
 int main()
 {
-    switch (2)
+    switch (3)
     {
         case 1: BouncingSpheres();  break;
         case 2: CheckeredSpheres(); break;
+        case 3: Earth();            break;
     }
 }

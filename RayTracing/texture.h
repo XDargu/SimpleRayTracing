@@ -1,5 +1,7 @@
 #pragma once
 
+#include "rt_stb_image.h"
+
 class Texture
 {
 public:
@@ -55,4 +57,32 @@ private:
     double invScale;
     shared_ptr<Texture> even;
     shared_ptr<Texture> odd;
+};
+
+class ImageTexture : public Texture
+{
+public:
+    ImageTexture(const char* filename)
+        : image(filename) 
+    {}
+
+    Color Value(double u, double v, const Point3& p) const override
+    {
+        // If we have no texture data, then return solid cyan as a debugging aid.
+        if (image.height() <= 0) return Color(0, 1, 1);
+
+        // Clamp input texture coordinates to [0,1] x [1,0]
+        u = Interval(0, 1).Clamp(u);
+        v = 1.0 - Interval(0, 1).Clamp(v);  // Flip V to image coordinates
+
+        const int i = int(u * image.width());
+        const int j = int(v * image.height());
+        const unsigned char* pixel = image.pixel_data(i, j);
+
+        const double colorScale = 1.0 / 255.0;
+        return Color(colorScale * pixel[0], colorScale * pixel[1], colorScale * pixel[2]);
+    }
+
+private:
+    rtw_image image;
 };
