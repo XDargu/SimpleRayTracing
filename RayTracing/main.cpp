@@ -5,13 +5,16 @@
 #include "hittable.h"
 #include "hittableList.h"
 #include "material.h"
-#include "Sphere.h"
+#include "sphere.h"
+#include "texture.h"
 
-int main()
+void BouncingSpheres()
 {
     HittableList world;
-    
-    auto ground_material = make_shared<Lambertian>(Color(0.5, 0.5, 0.5));
+
+    shared_ptr<Texture> checker = make_shared<CheckerTexture>(0.32, Color(.2, .3, .1), Color(.9, .9, .9));
+    shared_ptr<Material> ground_material = make_shared<Lambertian>(checker);
+
     world.Add(make_shared<Sphere>(Point3(0, -1000, 0), 1000, ground_material));
 
     for (int a = -11; a < 11; a++) {
@@ -72,4 +75,39 @@ int main()
     cam.focusDist = 10.0;
 
     cam.Render(world);
+}
+
+void CheckeredSpheres()
+{
+    HittableList world;
+
+    auto checker = make_shared<CheckerTexture>(0.32, Color(.2, .3, .1), Color(.9, .9, .9));
+
+    world.Add(make_shared<Sphere>(Point3(0, -10, 0), 10, make_shared<Lambertian>(checker)));
+    world.Add(make_shared<Sphere>(Point3(0, 10, 0), 10, make_shared<Lambertian>(checker)));
+
+    Camera cam;
+
+    cam.aspectRatio = 16.0 / 9.0;
+    cam.imageWidth = 400;
+    cam.samplesPerPixel = 10;
+    cam.maxDepth = 50;
+
+    cam.vfov = 20;
+    cam.lookFrom = Point3(13, 2, 3);
+    cam.lookAt = Point3(0, 0, 0);
+    cam.up = Vec3(0, 1, 0);
+
+    cam.defocusAngle = 0;
+
+    cam.Render(world);
+}
+
+int main()
+{
+    switch (2)
+    {
+        case 1: BouncingSpheres();  break;
+        case 2: CheckeredSpheres(); break;
+    }
 }

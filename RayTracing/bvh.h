@@ -6,7 +6,8 @@
 
 #include <algorithm>
 
-class BVH_Node : public Hittable {
+class BVH_Node : public Hittable
+{
 public:
     BVH_Node(HittableList list)
         : BVH_Node(list.objects, 0, list.objects.size())
@@ -15,6 +16,7 @@ public:
         // implicit copy of the hittable list, which we will modify. The lifetime of the copied
         // list only extends until this constructor exits. That's OK, because we only need to
         // persist the resulting bounding volume hierarchy.
+        // Note that this is copying the *pointers* not the object themselves
     }
 
     BVH_Node(std::vector<shared_ptr<Hittable>>& objects, size_t start, size_t end)
