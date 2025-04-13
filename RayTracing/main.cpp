@@ -25,7 +25,8 @@ int main()
                     // diffuse
                     const Color albedo = Color::Random() * Color::Random();
                     Sphere_material = make_shared<Lambertian>(albedo);
-                    world.Add(make_shared<Sphere>(center, 0.2, Sphere_material));
+                    const Vec3 center2 = center + Vec3(0, Random::Double(0, .5), 0);
+                    world.Add(make_shared<Sphere>(center, center2, 0.2, Sphere_material));
                 }
                 else if (choose_mat < 0.95) {
                     // metal
@@ -56,7 +57,7 @@ int main()
     Camera cam;
 
     cam.aspectRatio = 16.0 / 9.0;
-    cam.imageWidth = 1200;
+    cam.imageWidth = 400;
     cam.samplesPerPixel = 10;
     cam.maxDepth = 50;
 

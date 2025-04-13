@@ -132,14 +132,15 @@ private:
         // sampled point around the pixel location i, j.
 
         const Vec3 offset = SampleSquare();
-        const Vec3 pixel_sample = pixel00Loc
+        const Vec3 pixelSample = pixel00Loc
             + ((i + offset.x()) * pixelDelta_u)
             + ((j + offset.y()) * pixelDelta_v);
 
-        const Vec3 ray_origin = (defocusAngle <= 0) ? center : DefocusDiskSample();
-        const Vec3 ray_direction = pixel_sample - ray_origin;
+        const Vec3 rayOrigin = (defocusAngle <= 0) ? center : DefocusDiskSample();
+        const Vec3 rayDirection = pixelSample - rayOrigin;
+        const double rayTime = Random::Double();
 
-        return Ray(ray_origin, ray_direction);
+        return Ray(rayOrigin, rayDirection, rayTime);
     }
 
     static Vec3 SampleSquare()
