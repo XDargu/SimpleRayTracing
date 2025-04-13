@@ -1,5 +1,6 @@
 #include "raytracing.h"
 
+#include "bvh.h"
 #include "camera.h"
 #include "hittable.h"
 #include "hittableList.h"
@@ -53,6 +54,7 @@ int main()
     auto material3 = make_shared<Metal>(Color(0.7, 0.6, 0.5), 0.0);
     world.Add(make_shared<Sphere>(Point3(4, 1, 0), 1.0, material3));
 
+    world = HittableList(make_shared<BVH_Node>(world));
 
     Camera cam;
 

@@ -10,14 +10,22 @@ public:
         : center(staticCenter, Vec3(0, 0, 0))
         , radius(std::fmax(0, radius))
         , mat(mat)
-    {}
+    {
+        const Vec3 rvec = Vec3(radius, radius, radius);
+        bbox = AABB(staticCenter - rvec, staticCenter + rvec);
+    }
 
     // Moving Sphere
     Sphere(const Point3& center1, const Point3& center2, double radius, shared_ptr<Material> mat)
         : center(center1, center2 - center1)
         , radius(std::fmax(0, radius))
         , mat(mat)
-    {}
+    {
+        const Vec3 rvec = Vec3(radius, radius, radius);
+        AABB box1(center.at(0) - rvec, center.at(0) + rvec);
+        AABB box2(center.at(1) - rvec, center.at(1) + rvec);
+        bbox = AABB(box1, box2);
+    }
 
     bool Hit(const Ray& r, const Interval& ray_t, HitRecord& rec) const override
     {
@@ -51,8 +59,11 @@ public:
         return true;
     }
 
+    virtual AABB BoundingBox() const { return bbox; }
+
 private:
     Ray center;
     double radius;
     shared_ptr<Material> mat;
+    AABB bbox;
 };
