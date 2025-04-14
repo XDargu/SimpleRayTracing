@@ -1,5 +1,6 @@
 #pragma once
 
+#include "perlin.h"
 #include "rt_stb_image.h"
 
 class Texture
@@ -85,4 +86,22 @@ public:
 
 private:
     rtw_image image;
+};
+
+class NoiseTexture : public Texture
+{
+public:
+    NoiseTexture(double scale)
+        : scale(scale)
+    {}
+
+    Color Value(double u, double v, const Point3& p) const override
+    {
+        // Map [-1, 1] noise output to [0, 1] range
+        return Color(1, 1, 1) * 0.5 * (1.0 + noise.Noise(scale * p));
+    }
+
+private:
+    Perlin noise;
+    double scale;
 };
