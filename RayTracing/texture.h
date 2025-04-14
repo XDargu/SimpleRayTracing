@@ -97,8 +97,7 @@ public:
 
     Color Value(double u, double v, const Point3& p) const override
     {
-        // Map [-1, 1] noise output to [0, 1] range
-        return Color(1, 1, 1) * 0.5 * (1.0 + noise.Noise(scale * p));
+        return Color(.5, .5, .5) * (1 + std::sin(scale * p.z() + 10 * noise.Turb(p, 7)));
     }
 
 private:
