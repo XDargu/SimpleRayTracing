@@ -24,56 +24,83 @@ public:
 
     void Render(const Hittable& world)
     {
+        const auto processorCount = std::thread::hardware_concurrency();
+        auto start = clock();
+
         Initialize();
 
         std::cout << "P3\n" << imageWidth << ' ' << imageHeight << "\n255\n";
 
-        std::vector<Color> resultsPerSample(samplesPerPixel);
-        std::vector<std::thread> threads(samplesPerPixel);
+        std::vector<Color> pixels(imageWidth * imageHeight);
+        constexpr bool useAsync = true;
 
-        constexpr bool useAsync = false;
-
-        for (int j = 0; j < imageHeight; j++)
+        if (!useAsync)
         {
-            std::clog << "\rScanlines remaining: " << (imageHeight - j) << ' ' << std::flush;
-            for (int i = 0; i < imageWidth; i++)
+            for (int j = 0; j < imageHeight; j++)
             {
-                Color pixelColor(0, 0, 0);
-                
-                if (useAsync)
+                std::clog << "\rScanlines remaining: " << (imageHeight - j) << ' ' << std::flush;
+                for (int i = 0; i < imageWidth; i++)
                 {
-                    for (int sample = 0; sample < samplesPerPixel; sample++)
-                    {
-                        threads[sample] = std::thread([this, &resultsPerSample, &world, i, j, sample] {
-                            const Ray r = GetRay(i, j);
-                            resultsPerSample[sample] = RayColor(r, maxDepth, world);
-                        });
-                    }
+                    Color pixelColor(0, 0, 0);
 
-                    for (unsigned int i = 0; i < threads.size(); ++i)
-                    {
-                        threads.at(i).join();
-                    }
-
-                    for (unsigned int i = 0; i < threads.size(); ++i)
-                    {
-                        pixelColor += resultsPerSample.at(i);
-                    }
-                }
-                else
-                {
                     for (int sample = 0; sample < samplesPerPixel; sample++)
                     {
                         const Ray r = GetRay(i, j);
                         pixelColor += RayColor(r, maxDepth, world);
                     }
-                }
 
-                WriteColor(std::cout, pixelColor * pixelSamplesScale);
+                    pixels[j * imageHeight + i] = pixelColor * pixelSamplesScale;
+                }
+            }
+        }
+        else
+        {
+            std::atomic<int> processed = 0;
+            std::vector<std::thread> threads(processorCount);
+
+            // Split the amount of scanlines
+            const int linesPerProcessor = imageHeight / processorCount;
+
+            for (int p = 0; p < processorCount; ++p)
+            {
+                const int start = linesPerProcessor * p;
+                const int end = p == processorCount - 1 ? imageHeight : linesPerProcessor * (p + 1);
+
+                threads[p] = std::thread([this, &pixels, &world, &processed, start, end]
+                {
+                    for (int j = start; j < end; j++)
+                    {
+                        std::clog << "\rScanlines remaining: " << (imageHeight - processed) << "          " << std::flush;
+                        for (int i = 0; i < imageWidth; i++)
+                        {
+                            Color pixelColor(0, 0, 0);
+
+                            for (int sample = 0; sample < samplesPerPixel; sample++)
+                            {
+                                const Ray r = GetRay(i, j);
+                                pixelColor += RayColor(r, maxDepth, world);
+                            }
+
+                            pixels[j * imageHeight + i] = pixelColor * pixelSamplesScale;
+                        }
+                        ++processed;
+                    }
+                });
+            }
+
+            for (unsigned int i = 0; i < threads.size(); ++i)
+            {
+                threads.at(i).join();
             }
         }
 
-        std::clog << "\rDone.                 \n";
+        for (const Color& color : pixels)
+        {
+            WriteColor(std::cout, color);
+        }
+
+        auto elapsed = double(clock() - start) / CLOCKS_PER_SEC;
+        std::clog << "\rDone. Total time: " << elapsed << "s                  \n";
     }
 
 private:

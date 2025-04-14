@@ -314,7 +314,7 @@ void CheckeredSpheres()
 
 int main()
 {
-    switch (8)
+    switch (7)
     {
         case 1: BouncingSpheres();  break;
         case 2: CheckeredSpheres(); break;
