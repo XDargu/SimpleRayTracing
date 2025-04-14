@@ -15,7 +15,7 @@ public:
 
     void Clear() { objects.clear(); }
 
-    void Add(shared_ptr<Hittable> object)
+    void Add(const shared_ptr<Hittable>& object)
     {
         objects.push_back(object);
         bbox = AABB(bbox, object->BoundingBox());

@@ -30,7 +30,7 @@ public:
         std::vector<Color> resultsPerSample(samplesPerPixel);
         std::vector<std::thread> threads(samplesPerPixel);
 
-        constexpr bool useAsync = true;
+        constexpr bool useAsync = false;
 
         for (int j = 0; j < imageHeight; j++)
         {

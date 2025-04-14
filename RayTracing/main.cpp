@@ -5,8 +5,44 @@
 #include "hittable.h"
 #include "hittableList.h"
 #include "material.h"
+#include "quad.h"
 #include "sphere.h"
 #include "texture.h"
+
+void Quads()
+{
+    HittableList world;
+
+    // Materials
+    auto leftRed     = make_shared<Lambertian>(Color(1.0, 0.2, 0.2));
+    auto backGreen   = make_shared<Lambertian>(Color(0.2, 1.0, 0.2));
+    auto rightBlue   = make_shared<Lambertian>(Color(0.2, 0.2, 1.0));
+    auto upperOrange = make_shared<Lambertian>(Color(1.0, 0.5, 0.0));
+    auto lowerTeal   = make_shared<Lambertian>(Color(0.2, 0.8, 0.8));
+
+    // Quads
+    world.Add(make_shared<Quad>(Point3(-3, -2, 5), Vec3(0, 0,-4), Vec3(0, 4, 0), leftRed));
+    world.Add(make_shared<Quad>(Point3(-2, -2, 0), Vec3(4, 0, 0), Vec3(0, 4, 0), backGreen));
+    world.Add(make_shared<Quad>(Point3( 3, -2, 1), Vec3(0, 0, 4), Vec3(0, 4, 0), rightBlue));
+    world.Add(make_shared<Quad>(Point3(-2,  3, 1), Vec3(4, 0, 0), Vec3(0, 0, 4), upperOrange));
+    world.Add(make_shared<Quad>(Point3(-2, -3, 5), Vec3(4, 0, 0), Vec3(0, 0,-4), lowerTeal));
+
+    Camera cam;
+
+    cam.aspectRatio = 1.0;
+    cam.imageWidth = 400;
+    cam.samplesPerPixel = 10;
+    cam.maxDepth = 50;
+
+    cam.vfov = 80;
+    cam.lookFrom = Point3(0, 0, 9);
+    cam.lookAt = Point3(0, 0, 0);
+    cam.up = Vec3(0, 1, 0);
+
+    cam.defocusAngle = 0;
+
+    cam.Render(world);
+}
 
 void PerlinSpheres()
 {
@@ -153,11 +189,12 @@ void CheckeredSpheres()
 
 int main()
 {
-    switch (4)
+    switch (5)
     {
         case 1: BouncingSpheres();  break;
         case 2: CheckeredSpheres(); break;
         case 3: Earth();            break;
         case 4: PerlinSpheres();    break;
+        case 5: Quads();    break;
     }
 }
