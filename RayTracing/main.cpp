@@ -9,6 +9,70 @@
 #include "sphere.h"
 #include "texture.h"
 
+void CornellBox()
+{
+    HittableList world;
+
+    auto red   = make_shared<Lambertian>(Color(.65, .05, .05));
+    auto white = make_shared<Lambertian>(Color(.73, .73, .73));
+    auto green = make_shared<Lambertian>(Color(.12, .45, .15));
+    auto light = make_shared<DiffuseLight>(Color(15, 15, 15));
+
+    world.Add(make_shared<Quad>(Point3(555, 0, 0), Vec3(0, 555, 0), Vec3(0, 0, 555), green));
+    world.Add(make_shared<Quad>(Point3(0, 0, 0), Vec3(0, 555, 0), Vec3(0, 0, 555), red));
+    world.Add(make_shared<Quad>(Point3(343, 554, 332), Vec3(-130, 0, 0), Vec3(0, 0, -105), light));
+    world.Add(make_shared<Quad>(Point3(0, 0, 0), Vec3(555, 0, 0), Vec3(0, 0, 555), white));
+    world.Add(make_shared<Quad>(Point3(555, 555, 555), Vec3(-555, 0, 0), Vec3(0, 0, -555), white));
+    world.Add(make_shared<Quad>(Point3(0, 0, 555), Vec3(555, 0, 0), Vec3(0, 555, 0), white));
+
+    Camera cam;
+
+    cam.aspectRatio = 1.0;
+    cam.imageWidth = 600;
+    cam.samplesPerPixel = 100;
+    cam.maxDepth = 50;
+    cam.background = Color(0, 0, 0);
+
+    cam.vfov = 40;
+    cam.lookFrom = Point3(278, 278, -800);
+    cam.lookAt = Point3(278, 278, 0);
+    cam.up = Vec3(0, 1, 0);
+
+    cam.defocusAngle = 0;
+
+    cam.Render(world);
+}
+
+void SimpleLight()
+{
+    HittableList world;
+
+    auto pertext = make_shared<NoiseTexture>(4);
+    world.Add(make_shared<Sphere>(Point3(0, -1000, 0), 1000, make_shared<Lambertian>(pertext)));
+    world.Add(make_shared<Sphere>(Point3(0, 2, 0), 2, make_shared<Lambertian>(pertext)));
+
+    auto difflight = make_shared<DiffuseLight>(Color(4, 4, 4));
+    world.Add(make_shared<Sphere>(Point3(0, 7, 0), 2, difflight));
+    world.Add(make_shared<Quad>(Point3(3, 1, -2), Vec3(2, 0, 0), Vec3(0, 2, 0), difflight));
+
+    Camera cam;
+
+    cam.aspectRatio = 16.0 / 9.0;
+    cam.imageWidth = 400;
+    cam.samplesPerPixel = 50;
+    cam.maxDepth = 50;
+    cam.background = Color(0, 0, 0);
+
+    cam.vfov = 20;
+    cam.lookFrom = Point3(26, 3, 6);
+    cam.lookAt = Point3(0, 2, 0);
+    cam.up = Vec3(0, 1, 0);
+
+    cam.defocusAngle = 0;
+
+    cam.Render(world);
+}
+
 void Quads()
 {
     HittableList world;
@@ -33,6 +97,7 @@ void Quads()
     cam.imageWidth = 400;
     cam.samplesPerPixel = 10;
     cam.maxDepth = 50;
+    cam.background = Color(0.70, 0.80, 1.00);
 
     cam.vfov = 80;
     cam.lookFrom = Point3(0, 0, 9);
@@ -58,6 +123,7 @@ void PerlinSpheres()
     cam.imageWidth = 400;
     cam.samplesPerPixel = 10;
     cam.maxDepth = 50;
+    cam.background = Color(0.70, 0.80, 1.00);
 
     cam.vfov = 20;
     cam.lookFrom = Point3(13, 2, 3);
@@ -81,6 +147,7 @@ void Earth()
     cam.imageWidth = 400;
     cam.samplesPerPixel = 10;
     cam.maxDepth = 50;
+    cam.background = Color(0.70, 0.80, 1.00);
 
     cam.vfov = 20;
     cam.lookFrom = Point3(0, 0, 12);
@@ -149,6 +216,7 @@ void BouncingSpheres()
     cam.imageWidth = 400;
     cam.samplesPerPixel = 10;
     cam.maxDepth = 50;
+    cam.background = Color(0.70, 0.80, 1.00);
 
     cam.vfov = 20;
     cam.lookFrom = Point3(13, 2, 3);
@@ -176,6 +244,7 @@ void CheckeredSpheres()
     cam.imageWidth = 400;
     cam.samplesPerPixel = 10;
     cam.maxDepth = 50;
+    cam.background = Color(0.70, 0.80, 1.00);
 
     cam.vfov = 20;
     cam.lookFrom = Point3(13, 2, 3);
@@ -189,12 +258,14 @@ void CheckeredSpheres()
 
 int main()
 {
-    switch (5)
+    switch (7)
     {
         case 1: BouncingSpheres();  break;
         case 2: CheckeredSpheres(); break;
         case 3: Earth();            break;
         case 4: PerlinSpheres();    break;
-        case 5: Quads();    break;
+        case 5: Quads();            break;
+        case 6: SimpleLight();      break;
+        case 7: CornellBox();       break;
     }
 }

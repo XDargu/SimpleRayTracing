@@ -12,6 +12,11 @@ public:
     {
         return false;
     }
+
+    virtual Color Emitted(double u, double v, const Point3& p) const
+    {
+        return Color(0, 0, 0);
+    }
 };
 
 class Lambertian : public Material
@@ -105,4 +110,19 @@ private:
     // Refractive index in vacuum or air, or the ratio of the material's refractive index over
     // the refractive index of the enclosing media
     double refractionIndex;
+};
+
+class DiffuseLight : public Material
+{
+public:
+    DiffuseLight(shared_ptr<Texture> tex) : tex(tex) {}
+    DiffuseLight(const Color& emit) : tex(make_shared<SolidColor>(emit)) {}
+
+    Color Emitted(double u, double v, const Point3& p) const override
+    {
+        return tex->Value(u, v, p);
+    }
+
+private:
+    shared_ptr<Texture> tex;
 };

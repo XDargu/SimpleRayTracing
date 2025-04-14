@@ -12,6 +12,7 @@ public:
     int    imageWidth = 400;         // Rendered image width in pixel count
     int    samplesPerPixel = 10;     // Count of random samples for each pixel
     int    maxDepth = 10;            // Maximum number of ray bounces into scene
+    Color  background;               // Scene background color
 
     double vfov = 90;                    // Vertical view angle (field of view)
     Point3 lookFrom = Point3(0, 0, 0);   // Point camera is looking from
@@ -163,18 +164,21 @@ private:
             return Color(0, 0, 0);
 
         HitRecord rec;
-        if (world.Hit(r, Interval(0.001, infinity), rec))
-        {
-            Ray scattered;
-            Color attenuation;
-            if (rec.mat->Scatter(r, rec, attenuation, scattered))
-                return attenuation * RayColor(scattered, depth - 1, world);
 
-            return Color(0, 0, 0);
-        }
 
-        const Vec3 unitDirection = UnitVector(r.direction());
-        auto a = 0.5 * (unitDirection.y() + 1.0);
-        return (1.0 - a) * Color(1.0, 1.0, 1.0) + a * Color(0.5, 0.7, 1.0);
+        // If the ray hits nothing, return the background color.
+        if (!world.Hit(r, Interval(0.001, infinity), rec))
+            return background;
+
+        Ray scattered;
+        Color attenuation;
+        const Color colorFromEmission = rec.mat->Emitted(rec.u, rec.v, rec.p);
+
+        if (!rec.mat->Scatter(r, rec, attenuation, scattered))
+            return colorFromEmission;
+
+        const Color colorFromScatter = attenuation * RayColor(scattered, depth - 1, world);
+
+        return colorFromEmission + colorFromScatter;
     }
 };
