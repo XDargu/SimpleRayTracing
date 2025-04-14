@@ -2,12 +2,58 @@
 
 #include "bvh.h"
 #include "camera.h"
+#include "constantMedium.h"
 #include "hittable.h"
 #include "hittableList.h"
 #include "material.h"
 #include "quad.h"
 #include "sphere.h"
 #include "texture.h"
+
+void CornellSmoke()
+{
+    HittableList world;
+
+    auto red   = make_shared<Lambertian>(Color(.65, .05, .05));
+    auto white = make_shared<Lambertian>(Color(.73, .73, .73));
+    auto green = make_shared<Lambertian>(Color(.12, .45, .15));
+    auto light = make_shared<DiffuseLight>(Color(15, 15, 15));
+
+    world.Add(make_shared<Quad>(Point3(555, 0, 0),     Vec3(0, 555, 0),  Vec3(0, 0, 555),  green));
+    world.Add(make_shared<Quad>(Point3(0, 0, 0),       Vec3(0, 555, 0),  Vec3(0, 0, 555),  red));
+    world.Add(make_shared<Quad>(Point3(343, 554, 332), Vec3(-130, 0, 0), Vec3(0, 0, -105), light));
+    world.Add(make_shared<Quad>(Point3(0, 0, 0),       Vec3(555, 0, 0),  Vec3(0, 0, 555),  white));
+    world.Add(make_shared<Quad>(Point3(555, 555, 555), Vec3(-555, 0, 0), Vec3(0, 0, -555), white));
+    world.Add(make_shared<Quad>(Point3(0, 0, 555),     Vec3(555, 0, 0),  Vec3(0, 555, 0),  white));
+
+    shared_ptr<Hittable> box1 = Box(Point3(0, 0, 0), Point3(165, 330, 165), white);
+    box1 = make_shared<Rotate_Y>(box1, 15);
+    box1 = make_shared<Translate>(box1, Vec3(265, 0, 295));
+
+    shared_ptr<Hittable> box2 = Box(Point3(0, 0, 0), Point3(165, 165, 165), white);
+    box2 = make_shared<Rotate_Y>(box2, -18);
+    box2 = make_shared<Translate>(box2, Vec3(130, 0, 65));
+
+    world.Add(make_shared<ConstantMedium>(box1, 0.01, Color(0, 0, 0)));
+    world.Add(make_shared<ConstantMedium>(box2, 0.01, Color(1, 1, 1)));
+
+    Camera cam;
+
+    cam.aspectRatio = 1.0;
+    cam.imageWidth = 600;
+    cam.samplesPerPixel = 50;
+    cam.maxDepth = 50;
+    cam.background = Color(0, 0, 0);
+
+    cam.vfov = 40;
+    cam.lookFrom = Point3(278, 278, -800);
+    cam.lookAt = Point3(278, 278, 0);
+    cam.up = Vec3(0, 1, 0);
+
+    cam.defocusAngle = 0;
+
+    cam.Render(world);
+}
 
 void CornellBox()
 {
@@ -268,7 +314,7 @@ void CheckeredSpheres()
 
 int main()
 {
-    switch (7)
+    switch (8)
     {
         case 1: BouncingSpheres();  break;
         case 2: CheckeredSpheres(); break;
@@ -277,5 +323,6 @@ int main()
         case 5: Quads();            break;
         case 6: SimpleLight();      break;
         case 7: CornellBox();       break;
+        case 8: CornellSmoke();     break;
     }
 }

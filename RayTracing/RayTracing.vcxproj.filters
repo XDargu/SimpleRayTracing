@@ -74,5 +74,8 @@
     <ClInclude Include="quad.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="constantMedium.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
