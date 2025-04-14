@@ -76,16 +76,20 @@ void CornellBox()
     box1 = make_shared<Translate>(box1, Vec3(265, 0, 295));
     world.Add(box1);
 
-    shared_ptr<Hittable> box2 = Box(Point3(0, 0, 0), Point3(165, 165, 165), white);
+    /*shared_ptr<Hittable> box2 = Box(Point3(0, 0, 0), Point3(165, 165, 165), white);
     box2 = make_shared<Rotate_Y>(box2, -18);
     box2 = make_shared<Translate>(box2, Vec3(130, 0, 65));
-    world.Add(box2);
+    world.Add(box2);*/
+
+    // Glass Sphere
+    auto glass = make_shared<Dielectric>(1.5);
+    world.Add(make_shared<Sphere>(Point3(190, 90, 190), 90, glass));
 
     Camera cam;
 
     cam.aspectRatio = 1.0;
-    cam.imageWidth = 600;
-    cam.samplesPerPixel = 50;
+    cam.imageWidth = 100;
+    cam.samplesPerPixel = 8000;
     cam.maxDepth = 50;
     cam.background = Color(0, 0, 0);
 
